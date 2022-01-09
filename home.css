@@ -1,0 +1,18 @@
+#map {
+    width: 100%;
+    height: 550px;
+}
+
+h1 {
+    text-align: center;
+    color: #3EB595;
+    font-family: 'Roboto', sans-serif;
+    margin-top: 20px;
+}
+
+.coordinate {
+    text-align: center;
+    color: #110e3d;
+    font-family: 'Roboto', sans-serif;
+    margin-top: -30px;
+}
