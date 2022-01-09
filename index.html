@@ -20,13 +20,29 @@
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
 
+        <script src="home.js"></script>
+
         <!-- jquery -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
 
         <style>
             #map {
                 width: 100%;
-                height: 600px;
+                height: 550px;
+            }
+
+            h1 {
+                text-align: center;
+                color: #3EB595;
+                font-family: 'Roboto', sans-serif;
+                margin-top: 20px;
+            }
+
+            .coordinate {
+                text-align: center;
+                color: #110e3d;
+                font-family: 'Roboto', sans-serif;
+                margin-top: -30px;
             }
 
         </style>
@@ -36,6 +52,7 @@
     </head>
 
     <body>
+        <h1>Leaflet Project</h1>
         <div id="map"></div>
         <button type="button" class="btn btn-outline-dark">View in full screen</button>
         <div class="coordinate"></div>
@@ -64,7 +81,7 @@
 
     // Map coordinates display on mouse hover
     map.on('mousemove', function(e) {
-        document.querySelector('.coordinate').innerHTML = 'Latitude: ' + e.latlng.lat.toFixed(4) + '<br>Longitude: ' + e.latlng.lng.toFixed(4);
+        document.querySelector('.coordinate').innerHTML = '<b>Coordinates</b><br>' + convertDMS(e.latlng.lat, e.latlng.lng);
     });
 
 </script>
