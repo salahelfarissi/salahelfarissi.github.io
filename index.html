@@ -65,6 +65,14 @@
     L.marker([33.99895989469748, -6.749373542319338]).addTo(map)
         .bindPopup('My sweet home!')
         .openPopup();
+
+    // Add circle
+    var circle = L.circle([33.99895989469748, -6.749373542319338], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 500
+    }).addTo(map);
      
     // Add map scale
     // L.control.scale().addTo(map);
