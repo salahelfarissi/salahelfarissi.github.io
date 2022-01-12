@@ -15,6 +15,9 @@
             integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
             crossorigin=""/>
 
+        <!-- Leaflet Measure Styles -->
+        <link rel="stylesheet" href="./leaflet-measure.css">
+
         <!-- Make sure you put this AFTER Leaflet's CSS -->
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -25,13 +28,13 @@
         <link rel="stylesheet" href="home.css">
 
         <!-- jquery -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-        <style>
-            
+        <!-- Print Functionality -->
+        <script src="./leaflet.browser.print.min.js"></script>
 
-        </style>
-    
+        <!-- Measure Area & Stuff -->
+        <script src="./leaflet-measure.js"></script>
 
         <title>Leaflet Project</title>
     </head>
@@ -39,27 +42,35 @@
     <body>
         <h1>Leaflet Project</h1>
         <div id="map"></div>
-        <button type="button" class="btn btn-outline-dark">View in full screen</button>
+        <button type="button">View in full screen</button>
         <div class="coordinate"></div>
+        <!-- <button class="print">Print map!</button> -->
     </body>
     
 </html>
 
+
+<!-- JavaScript -->
 <script>
+
     var map = L.map('map').setView([33.99895989469748, -6.749373542319338], 20);
     map.zoomControl.setPosition('topright');
 
+    // Adding osm tilelayer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    // Adding marker in the center of the map
     L.marker([33.99895989469748, -6.749373542319338]).addTo(map)
         .bindPopup('Home')
         .openPopup();
-        
+     
+    // Add map scale
     L.control.scale().addTo(map);
     // L.control.scale({position: 'bottomright'}).addTo(map);
 
+    // Full screnn
     document.querySelector('button').addEventListener('click', function() {
         document.getElementById('map').requestFullscreen();
 		});
@@ -68,5 +79,21 @@
     map.on('mousemove', function(e) {
         document.querySelector('.coordinate').innerHTML = convertDMS(e.latlng.lat, e.latlng.lng);
     });
+
+    // Add map print functionnality
+    // $('.print').click(function() {
+    //     window.print();
+    // });
+
+    // Leaflet Plugin for Map Print
+    L.control.browserPrint().addTo(map)
+
+    // Leaflet Plugin for Measure Area
+    L.control.measure({
+        primaryLengthUnit: 'kilometers',
+        secondaryLengthUnit: 'meters',
+        primaryAreaUnit: 'sqmeters',
+        secondaryAreaUnit: undefined
+    }).addTo(map);
 
 </script>

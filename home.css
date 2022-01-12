@@ -1,6 +1,7 @@
 #map {
-    width: 100%;
+    width: 550px;
     height: 550px;
+    margin: 0 auto;
 }
 
 h1 {
@@ -14,5 +15,4 @@ h1 {
     text-align: center;
     color: #110e3d;
     font-family: 'Roboto', sans-serif;
-    margin-top: -30px;
 }
