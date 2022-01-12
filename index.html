@@ -42,8 +42,8 @@
     <body>
         <h1>Leaflet Project</h1>
         <div id="map"></div>
-        <button type="button">View in full screen</button>
-        <div class="coordinate"></div>
+        <!-- <button type="button">View in full screen</button> -->
+        <!-- <div class="coordinate"></div> -->
         <!-- <button class="print">Print map!</button> -->
     </body>
     
@@ -63,7 +63,7 @@
 
     // Adding marker in the center of the map
     L.marker([33.99895989469748, -6.749373542319338]).addTo(map)
-        .bindPopup('Home')
+        .bindPopup('My sweet home!')
         .openPopup();
      
     // Add map scale
@@ -76,9 +76,9 @@
 	// 	});
 
     // Map coordinates display on mouse hover
-    map.on('mousemove', function(e) {
-        document.querySelector('.coordinate').innerHTML = convertDMS(e.latlng.lat, e.latlng.lng);
-    });
+    // map.on('mousemove', function(e) {
+    //     document.querySelector('.coordinate').innerHTML = convertDMS(e.latlng.lat, e.latlng.lng);
+    // });
 
     // Add map print functionnality
     // $('.print').click(function() {
