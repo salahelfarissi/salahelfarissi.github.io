@@ -16,12 +16,6 @@
             integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
             crossorigin=""/>
 
-        <!-- Leaflet Measure Styles -->
-        <link rel="stylesheet" href="./lib/leaflet-measure.css">
-
-        <!-- My own styles -->
-        <link rel="stylesheet" href="./lib/home.css">
-
         <!-- Make sure you put this AFTER Leaflet's CSS -->
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -30,25 +24,27 @@
         <!-- jquery -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-        <!-- Print Functionality -->
-        <script src="./lib/leaflet.browser.print.min.js"></script>
-
-        <!-- Measure Area & Stuff -->
-        <script src="./lib/leaflet-measure.js"></script>
+        <!-- My own styles -->
+        <link rel="stylesheet" href="./lib/home.css">
 
         <!-- My own scripts -->
         <script src="./lib/home.js"></script>
 
-        <title>Leaflet Project</title>
+        <!-- Data -->
+        <script src="./data/regions.js"></script>
+        <script src="./data/day_1.js"></script>
+
+        <title>Coronavirus in Morocco</title>
     </head>
 
     <body>
-        <h1 class="heading">Web Mapping</h1>
-        <h5 class="heading">Pr Hajji Hicham</h5>
         <div id="map"></div>
-        <button type="button" class="btn btn-primary" style="margin-left: 20px;">View in full screen</button>
-        <div class="coordinate"></div>
-        <!-- <button class="print">Print map!</button> -->
+        <div class="container">
+            <div class="center">
+                <button type="button" class="btn btn-primary btn-sm">View in full screen</button>
+                <button class="zoom-to-layer btn btn-secondary btn-sm">Zoom to extent</button>
+            </div>
+        </div>
     </body>
     
 </html>
@@ -56,96 +52,151 @@
 
 <!-- JavaScript -->
 <script>
+    // Initialize the map
+    // Coordinates of the center of Morocco from QGIS by right clicking on the map
+    let map = L.map('map').setView([29.3669, -9.0375], 5);
+    map.zoomControl.setPosition('topleft');
 
-    var map = L.map('map').setView([33.97652035306493, -6.866905195552063], 20);
-    map.zoomControl.setPosition('topright');
-
-    // Adding osm tilelayer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // Adding a default tilelayer
+    // Other tilelayers are in the home.js file
+    Stadia_AlidadeSmooth.addTo(map);
+     
+    // Map scale
+    L.control.scale().addTo(map);
+    
+    // Add regions layer
+    let regions = L.geoJSON(regions_data, {
+        style: style,
+        onEachFeature: onEachFeature
     }).addTo(map);
 
-    // Adding marker in the center of the map
-    // L.marker([33.99895989469748, -6.749373542319338]).addTo(map)
-    //     .bindPopup('My sweet home!')
-    //     .openPopup();
-
-    // Add circle
-    // var circle = L.circle([33.99895989469748, -6.749373542319338], {
-    //     color: 'red',
-    //     fillColor: '#f03',
-    //     fillOpacity: 0.5,
-    //     radius: 50
-    // }).addTo(map);
-
-    // Add polygon
-    var polygon = L.polygon([
-        [33.976677620881375, -6.867155781411752],
-        [33.97675256835037, -6.867082591434144],
-        [33.97675256835037, -6.867082591434144],
-        [33.97672227131358, -6.8670338795228165],
-        [33.97679999504317, -6.866955494725222],
-        [33.97673801225018, -6.866868582489506],
-        [33.97682119594444, -6.866790296586945],
-        [33.97669175837633, -6.866599260887263],
-        [33.97661260514359, -6.866661732037701],
-        [33.97656650355435, -6.866590384514986],
-        [33.976482833878, -6.866663380253942],
-        [33.97654055267639, -6.866757347853085],
-        [33.97651458215758, -6.86677996947969],
-        [33.97643084890454, -6.866645940557816],
-        [33.9763138787965, -6.866753876163748],
-        [33.97642946474875, -6.866936535847906],
-        [33.97639484043938, -6.86697306946919],
-        [33.97636451390612, -6.86693483387117],
-        [33.97618537162719, -6.86710036735084],
-        [33.97632372622856, -6.867311803942709],
-        [33.976500176368155, -6.867136144972722],
-        [33.97648432240159, -6.867113588143552],
-        [33.97657941229028, -6.867017895796283]
-    ]).addTo(map);
-
-    // Add polygon
-    var polygon2 = L.polygon([
-        [33.975042, -6.865670],
-        [33.974846, -6.865848],
-        [33.975031, -6.866133],
-        [33.975220, -6.865946],
-        [33.975220, -6.865946],
-        [33.975042, -6.865670]
-        ]).addTo(map);
-     
-    // Add map scale
-    L.control.scale().addTo(map);
-    // L.control.scale({position: 'bottomright'}).addTo(map);
-
     // Full screen button
+    // A div must be added to the body to be able to add the full screen button
     document.querySelector('button').addEventListener('click', function() {
         document.getElementById('map').requestFullscreen();
     });
 
-    // Map coordinates display on mouse hover
-    map.on('mousemove', function(e) {
-        $('.coordinate').html(`Lat: ${e.latlng.lat.toFixed(4)}<br>Lng: ${e.latlng.lng.toFixed(4)}`);
+    // Zoom to layer button
+    document.querySelector('.zoom-to-layer').addEventListener('click', function() {
+        map.fitBounds(regions.getBounds());
     });
-    // map.on('mousemove', function(e) {
-    //     document.querySelector('.coordinate').innerHTML = convertDMS(e.latlng.lat, e.latlng.lng);
-    // });
 
-    // Add map print functionnality
-    // $('.print').click(function() {
-    //     window.print();
-    // });
+    // Colors for graduated map
+    function getColor(d) {
+        return  d > 1170 ?  '#b30000' :
+                d > 470  ?  '#e34a33' :
+                d > 145  ?  '#fc8d59' :
+                d > 17   ?  '#fdcc8a' :
+                            '#fef0d9';
+    }
 
-    // Leaflet Plugin for Map Print
-    // L.control.browserPrint().addTo(map)
+    // Style for each region depending on the number of cases
+    function style(feature) {
+        return {
+            fillColor: getColor(feature.properties.new_cases_day_1),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    }
 
-    // Leaflet Plugin for Measure Area
-    // L.control.measure({
-    //     primaryLengthUnit: 'kilometers',
-    //     secondaryLengthUnit: 'meters',
-    //     primaryAreaUnit: 'sqmeters',
-    //     secondaryAreaUnit: undefined
-    // }).addTo(map);
+    // The regions get highlighted when they are hovered with a mouse
+    // First we’ll define an event listener for layer mouseover event
+    function highlightFeature(e) {
+        // Here we get access to the layer that was hovered through e.target
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 3,
+            color: '#264254',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+        // Bringing the highlighted state to the front so that the border doesn’t clash with nearby states
+        // IE, Opera or Edge, have problems doing bringToFront on mouseover
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+        // We need to update the control when the user hovers over a region
+        info.update(layer.feature.properties);
+    }
+
+    // Here we define what happens on mouseout
+    // The regions.resetStyle method will reset the layer style to its default state (defined by our style function)
+    function resetHighlight(e) {
+        regions.resetStyle(e.target);
+        // We need to update the control when the user hovers over a region
+        info.update();
+    }
+
+    // We define a click listener that zooms to the region when the user clicks on it
+    function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+    }
+
+    // Now we’ll use the onEachFeature option to add the listeners on our regions layers
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature
+        });
+    }
+
+    // We’ll create a new info control to display the region name and the number of cases
+    // I also added some CSS styles in the home.css file
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (props) {
+        this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>' +  (props ?
+            '<b>' + props.r_nom + '</b><br />' + props.new_cases_day_1 + ' new cases'
+            : 'Hover over a region');
+    };
+
+    info.addTo(map);
+
+    // We’ll create a legend control to display classes of colors
+    // I aslo added css styles in the home.css file
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            grades = [0, 17, 145, 470, 1170, 1810],
+            labels = [];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    legend.addTo(map);
+
+    // Leaflet layer control
+    let baseMaps = {
+        "Stadia Alidade Smooth": Stadia_AlidadeSmooth,
+        "CartoDB Voyager": CartoDB_Voyager,
+        "OSM": osm
+    };
+
+    let overlayMaps = {
+        'Regions': regions
+    }
+
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 </script>
