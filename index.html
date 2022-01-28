@@ -8,9 +8,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Bootstrap Styles -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        
         <!-- Leaflet Styles -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
             integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
@@ -21,20 +20,30 @@
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
 
-        <!-- Data -->
-        <script src="./data/regions.js"></script>
-
-        <!-- Styles -->
+        <!-- My Styles -->
         <link rel="stylesheet" href="./dist/style.css">
 
-        <!-- Main scripts -->
-        <script src="./dist/main.js"></script>
-
+        <!-- Title appearing in the browser tab -->
         <title>Coronavirus in Morocco</title>
         
     </head>
 
     <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+            <a class="navbar-brand" href="#">Géoportail</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                </ul>
+            </div>
+        </nav>
+
         <div id="map"></div>
         <div class="container">
             <div class="center">
@@ -46,160 +55,13 @@
     
 </html>
 
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-<!-- JavaScript -->
-<script>
-    // Initialize the map
-    // Coordinates of the center of Morocco from QGIS by right clicking on the map
-    let map = L.map('map').setView([29.3669, -9.0375], 5);
-    map.zoomControl.setPosition('topleft');
+<!-- My Data -->
+<script src="./data/regions.js"></script>
 
-    // Adding a default tilelayer
-    // Other tilelayers are in the main.js file
-    Stadia_AlidadeSmooth.addTo(map);
-     
-    // Map scale
-    L.control.scale({
-        imperial: false,
-        maxWidth: 200,
-        metric: true,
-    }).addTo(map);
-    
-    // Add regions layer
-    let regions = L.geoJSON(regions_data, {
-        style: style,
-        onEachFeature: onEachFeature
-    }).addTo(map);
-
-    // Full screen button
-    // A div must be added to the body to be able to add the full screen button
-    document.querySelector('.full-screen-button').addEventListener('click', function() {
-        document.getElementById('map').requestFullscreen(); 
-    });
-
-    // Zoom to layer button
-    document.querySelector('.zoom-to-layer').addEventListener('click', function() {
-        map.fitBounds(regions.getBounds());
-    });
-
-    // Colors for graduated map
-    function getColor(d) {
-        return  d > 1170 ?  '#b30000' :
-                d > 470  ?  '#e34a33' :
-                d > 145  ?  '#fc8d59' :
-                d > 17   ?  '#fdcc8a' :
-                            '#fef0d9';
-    }
-
-    // Style for each region depending on the number of cases
-    function style(feature) {
-        return {
-            fillColor: getColor(feature.properties.new_cases_day_1),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
-
-    // The regions get highlighted when they are hovered with a mouse
-    // First we’ll define an event listener for layer mouseover event
-    function highlightFeature(e) {
-        // Here we get access to the layer that was hovered through e.target
-        var layer = e.target;
-
-        layer.setStyle({
-            weight: 3,
-            color: '#264254',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-        // Bringing the highlighted state to the front so that the border doesn’t clash with nearby states
-        // IE, Opera or Edge, have problems doing bringToFront on mouseover
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-        // We need to update the control when the user hovers over a region
-        info.update(layer.feature.properties);
-    }
-
-    // Here we define what happens on mouseout
-    // The regions.resetStyle method will reset the layer style to its default state (defined by our style function)
-    function resetHighlight(e) {
-        regions.resetStyle(e.target);
-        // We need to update the control when the user hovers over a region
-        info.update();
-    }
-
-    // We define a click listener that zooms to the region when the user clicks on it
-    function zoomToFeature(e) {
-        map.fitBounds(e.target.getBounds());
-    }
-
-    // Now we’ll use the onEachFeature option to add the listeners on our regions layers
-    function onEachFeature(feature, layer) {
-        layer.on({
-            mouseover: highlightFeature,
-            mouseout: resetHighlight,
-            click: zoomToFeature
-        });
-    }
-
-    // We’ll create a new info control to display the region name and the number of cases
-    // I also added some CSS styles in the home.css file
-    var info = L.control();
-
-    info.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info');
-        this.update();
-        return this._div;
-    };
-
-    // method that we will use to update the control based on feature properties passed
-    info.update = function (props) {
-        this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>' +  (props ?
-            '<b>' + props.r_nom + '</b><br />' + props.new_cases_day_1 + ' new cases'
-            : 'Hover over a region');
-    };
-
-    info.addTo(map);
-
-    // We’ll create a legend control to display classes of colors
-    // I aslo added css styles in the home.css file
-    var legend = L.control({position: 'bottomright'});
-
-    legend.onAdd = function (map) {
-
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 17, 145, 470, 1170, 1810],
-            labels = [];
-
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-
-        return div;
-    };
-
-    legend.addTo(map);
-
-    // Leaflet layer control
-    let baseMaps = {
-        "Stadia Alidade Smooth": Stadia_AlidadeSmooth,
-        "CartoDB Voyager": CartoDB_Voyager,
-        "OSM": osm
-    };
-
-    let overlayMaps = {
-        'Regions': regions
-    }
-
-    L.control.layers(baseMaps, overlayMaps, {
-        collapsed: false
-    }).addTo(map);
-
-</script>
+<!-- Main scripts -->
+<script src="./dist/main.js"></script>
