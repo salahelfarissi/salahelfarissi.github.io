@@ -157,9 +157,9 @@ legend.addTo(map);
 
 // Leaflet layer control
 let baseMaps = {
+    "OSM": osm,
     "Stadia Alidade Smooth": Stadia_AlidadeSmooth,
-    "CartoDB Voyager": CartoDB_Voyager,
-    "OSM": osm
+    "CartoDB Voyager": CartoDB_Voyager
 };
 
 let overlayMaps = {
