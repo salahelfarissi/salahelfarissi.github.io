@@ -21,12 +21,8 @@
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
 
-        <!-- jquery -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
         <!-- Data -->
         <script src="./data/regions.js"></script>
-        <script src="./data/day_1.js"></script>
 
         <!-- Styles -->
         <link rel="stylesheet" href="./dist/style.css">
@@ -35,13 +31,14 @@
         <script src="./dist/main.js"></script>
 
         <title>Coronavirus in Morocco</title>
+        
     </head>
 
     <body>
         <div id="map"></div>
         <div class="container">
             <div class="center">
-                <button type="button" class="btn btn-primary btn-sm">View in full screen</button>
+                <button class="full-screen-button btn btn-primary btn-sm">View in full screen</button>
                 <button class="zoom-to-layer btn btn-secondary btn-sm">Zoom to extent</button>
             </div>
         </div>
@@ -58,11 +55,15 @@
     map.zoomControl.setPosition('topleft');
 
     // Adding a default tilelayer
-    // Other tilelayers are in the home.js file
+    // Other tilelayers are in the main.js file
     Stadia_AlidadeSmooth.addTo(map);
      
     // Map scale
-    L.control.scale().addTo(map);
+    L.control.scale({
+        imperial: false,
+        maxWidth: 200,
+        metric: true,
+    }).addTo(map);
     
     // Add regions layer
     let regions = L.geoJSON(regions_data, {
@@ -72,8 +73,8 @@
 
     // Full screen button
     // A div must be added to the body to be able to add the full screen button
-    document.querySelector('button').addEventListener('click', function() {
-        document.getElementById('map').requestFullscreen();
+    document.querySelector('.full-screen-button').addEventListener('click', function() {
+        document.getElementById('map').requestFullscreen(); 
     });
 
     // Zoom to layer button
