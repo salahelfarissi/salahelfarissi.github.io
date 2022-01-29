@@ -1,43 +1,29 @@
 $(document).ready(function() {
     let c;
 
-// Leaflet providers: https://leaflet-extras.github.io/leaflet-providers/preview/
-// Stadia tilelayer
-let Stadia_AlidadeSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-});
-
-// CartoDB tilelayer
-let CartoDB_Voyager = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
-});
-
-// OSM tilelayer
-let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-});
-
-// Initialize the map
-// Coordinates of the center of Morocco from QGIS by right clicking on the map
-let map = L.map('map', {
-    zoomSnap: 0.1,
-    zoomDelta: 0.4,
-    minZoom: 5,
-}).setView([28.6, -9.0375], 5.1);
-map.zoomControl.setPosition('topleft');
-
-// Adding a default tilelayer
-// Other tilelayers are in the main.js file
-osm.addTo(map);
+    // Initialize the map
+    // Coordinates of the center of Morocco from QGIS by right clicking on the map
+    let map = L.map('map', {
+        zoomSnap: 0.1,
+        zoomDelta: 0.4,
+        minZoom: 5,
+    }).setView([28.6, -9.0375], 5.1);
+    map.zoomControl.setPosition('topleft');
+    
+    // CartoDB tilelayer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
 
 $.getJSON("./data/regions.json")
     .done(function(data) {
         // console.log(data);
         let info = processData(data);
         createPropSymbols(info.timestamps, data);
+        createLegend(info.min, info.max);
+        createSliderUI(info.timestamps);
     })
     .fail(function() {alert("There has been a problem loading the data.")});
     
@@ -111,10 +97,11 @@ function updatePropSymbols(timestamps) {
         let props = layer.feature.properties;
         let radius = calcPropRadius(props[timestamps]);
         let popupContent = "<b>" + String(props[timestamps]) +
-        "units</b><br>" +
-        "<i>" + props.r_nom +
-        "</i> in </i>" +
-        timestamps + "</i>";
+        " nouveaux cas</b><br>" +
+        "<i>" + props.r_nom + "<br>" +
+        "</i>  </i>" +
+        timestamps + "</i>" +
+        " janvier 2022";
         layer.setRadius(radius);
         layer.bindPopup(popupContent, {
             offset: new L.Point(0,-radius)});
@@ -127,148 +114,105 @@ function calcPropRadius(attributeValue) {
     return Math.sqrt(area/Math.PI);
 }
 
-// Map scale
-L.control.scale({
-    imperial: false,
-    maxWidth: 200,
-    metric: true,
-}).addTo(map);
+function createLegend(min, max) {
+		 
+    if (min < 10) {	
+        min = 10; 
+    }
 
-// Add regions layer
-let regions = L.geoJSON(regions_data, {
-    style: style,
-    onEachFeature: onEachFeature
-}).addTo(map);
+    function roundNumber(inNumber) {
 
-// Full screen button
-// A div must be added to the body to be able to add the full screen button
-document.querySelector('.full-screen-button').addEventListener('click', function() {
-    document.getElementById('map').requestFullscreen(); 
-});
+            return (Math.round(inNumber/10) * 10);  
+    }
 
-// Zoom to layer button
-document.querySelector('.zoom-to-layer').addEventListener('click', function() {
-    map.fitBounds(regions.getBounds());
-});
+    var legend = L.control( { position: 'bottomright' } );
 
-// Colors for graduated map
-function getColor(d) {
-    return  d > 1170 ?  '#b30000' :
-            d > 470  ?  '#e34a33' :
-            d > 145  ?  '#fc8d59' :
-            d > 17   ?  '#fdcc8a' :
-                        '#fef0d9';
-}
+    legend.onAdd = function(map) {
 
-// Style for each region depending on the number of cases
-function style(feature) {
-    return {
-        fillColor: getColor(feature.properties.new_cases_day_1),
-        weight: 2,
-        opacity: 1,
-        color: 'white',
-        dashArray: '3',
-        fillOpacity: 0.7
+    var legendContainer = L.DomUtil.create("div", "legend");  
+    var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
+    var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)]; 
+    var legendCircle;  
+    var lastRadius = 0;
+    var currentRadius;
+    var margin;
+
+    L.DomEvent.addListener(legendContainer, 'mousedown', function(e) { 
+        L.DomEvent.stopPropagation(e); 
+    });  
+
+    $(legendContainer).append("<h3 id='legendTitle'># of somethings</h3>");
+    
+    for (var i = 0; i <= classes.length-1; i++) {  
+
+        legendCircle = L.DomUtil.create("div", "legendCircle");  
+        
+        currentRadius = calcPropRadius(classes[i]);
+        
+        margin = -currentRadius - lastRadius - 2;
+
+        $(legendCircle).attr("style", "width: " + currentRadius*2 + 
+            "px; height: " + currentRadius*2 + 
+            "px; margin-left: " + margin + "px" );				
+        $(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
+
+        $(symbolsContainer).append(legendCircle);
+
+        lastRadius = currentRadius;
+
+    }
+
+    $(legendContainer).append(symbolsContainer); 
+
+    return legendContainer; 
+
     };
-}
 
-// The regions get highlighted when they are hovered with a mouse
-// First we’ll define an event listener for layer mouseover event
-function highlightFeature(e) {
-    // Here we get access to the layer that was hovered through e.target
-    var layer = e.target;
+    legend.addTo(map);  
 
-    layer.setStyle({
-        weight: 3,
-        color: '#D95F69',
-        dashArray: '',
-        fillOpacity: 0.7
-    });
-    // Bringing the highlighted state to the front so that the border doesn’t clash with nearby states
-    // IE, Opera or Edge, have problems doing bringToFront on mouseover
-    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        layer.bringToFront();
-    }
-    // We need to update the control when the user hovers over a region
-    info.update(layer.feature.properties);
-}
+} // end createLegend();
 
-// Here we define what happens on mouseout
-// The regions.resetStyle method will reset the layer style to its default state (defined by our style function)
-function resetHighlight(e) {
-    regions.resetStyle(e.target);
-    // We need to update the control when the user hovers over a region
-    info.update();
-}
 
-// We define a click listener that zooms to the region when the user clicks on it
-function zoomToFeature(e) {
-    map.fitBounds(e.target.getBounds());
-}
+function createSliderUI(timestamps) {
+	
+    var sliderControl = L.control({ position: 'bottomleft'} );
 
-// Now we’ll use the onEachFeature option to add the listeners on our regions layers
-function onEachFeature(feature, layer) {
-    layer.on({
-        mouseover: highlightFeature,
-        mouseout: resetHighlight,
-        click: zoomToFeature
-    });
-}
+    sliderControl.onAdd = function(map) {
 
-// We’ll create a new info control to display the region name and the number of cases
-// I also added some CSS styles in the home.css file
-var info = L.control();
+        var slider = L.DomUtil.create("input", "range-slider");
 
-info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'info');
-    this.update();
-    return this._div;
-};
+        L.DomEvent.addListener(slider, 'mousedown', function(e) { 
+            L.DomEvent.stopPropagation(e); 
+        });
 
-// method that we will use to update the control based on feature properties passed
-info.update = function (props) {
-    this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>' +  (props ?
-        '<b>' + props.r_nom + '</b><br />' + props.new_cases_day_1 + ' new cases'
-        : 'Hover over a region');
-};
-
-info.addTo(map);
-
-// We’ll create a legend control to display classes of colors
-// I aslo added css styles in the home.css file
-var legend = L.control({position: 'bottomright'});
-
-legend.onAdd = function (map) {
-
-    var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0, 17, 145, 470, 1170, 1810],
-        labels = [];
-
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        $(slider)
+            .attr({'type':'range', 
+                'max': timestamps[timestamps.length-1], 
+                'min': timestamps[0], 
+                'step': 1,
+                'value': String(timestamps[0])})
+              .on('input change', function() {
+              updatePropSymbols($(this).val().toString());
+                  $(".temporal-legend").text(this.value);
+          });
+        return slider;
     }
 
-    return div;
-};
-
-legend.addTo(map);
-
-// Leaflet layer control
-let baseMaps = {
-    "OSM": osm,
-    "Stadia Alidade Smooth": Stadia_AlidadeSmooth,
-    "CartoDB Voyager": CartoDB_Voyager
-};
-
-let overlayMaps = {
-    'Regions': regions
+    sliderControl.addTo(map)
+    createTemporalLegend(timestamps[0]); 
 }
 
-L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-}).addTo(map);
+function createTemporalLegend(startTimestamp) {
+
+    var temporalLegend = L.control({ position: 'bottomleft' }); 
+
+    temporalLegend.onAdd = function(map) { 
+        var output = L.DomUtil.create("output", "temporal-legend");
+         $(output).text(startTimestamp)
+        return output; 
+    }
+
+    temporalLegend.addTo(map); 
+}
 
 });
