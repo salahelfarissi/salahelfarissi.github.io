@@ -115,104 +115,87 @@ function calcPropRadius(attributeValue) {
 }
 
 function createLegend(min, max) {
-		 
-    if (min < 10) {	
-        min = 10; 
+
+    if (min < 100) {
+        min = 350;
     }
 
     function roundNumber(inNumber) {
-
-            return (Math.round(inNumber/10) * 10);  
+        return (Math.round(inNumber/10) * 10);
     }
 
-    var legend = L.control( { position: 'bottomright' } );
+    let legend = L.control({position: 'bottomright'});
 
     legend.onAdd = function(map) {
 
-    var legendContainer = L.DomUtil.create("div", "legend");  
-    var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
-    var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)]; 
-    var legendCircle;  
-    var lastRadius = 0;
-    var currentRadius;
-    var margin;
+        let legendContainer = L.DomUtil.create('div', 'legend');
+        let symbolsContainer = L.DomUtil.create('div', 'symbolsContainer');
+        let classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)];
+        let legendCircle;
+        let lastRadius = 0;
+        let currentRadius;
+        let margin;
 
-    L.DomEvent.addListener(legendContainer, 'mousedown', function(e) { 
-        L.DomEvent.stopPropagation(e); 
-    });  
+        // Prevent mousedown event from propagating to the map
+        L.DomEvent.disableClickPropagation(legendContainer);
 
-    $(legendContainer).append("<h3 id='legendTitle'># of somethings</h3>");
-    
-    for (var i = 0; i <= classes.length-1; i++) {  
+        $(legendContainer).append("<h3 id='legendTitle'>Nouveaux cas</h3>");
 
-        legendCircle = L.DomUtil.create("div", "legendCircle");  
-        
-        currentRadius = calcPropRadius(classes[i]);
-        
-        margin = -currentRadius - lastRadius - 2;
+        for (let i = 0; i<= classes.length - 1; i++) {
+            legendCircle = L.DomUtil.create('div', 'legendCircle');
+            currentRadius = calcPropRadius(classes[i]);
+            margin = -currentRadius - lastRadius - 2;
 
-        $(legendCircle).attr("style", "width: " + currentRadius*2 + 
-            "px; height: " + currentRadius*2 + 
-            "px; margin-left: " + margin + "px" );				
-        $(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
+            $(legendCircle).attr("style", "width: " + (currentRadius * 2) +
+            "px; height: " + (currentRadius * 2) +
+            "px; margin-left: " + margin + "px");
 
-        $(symbolsContainer).append(legendCircle);
+            $(legendCircle).append("<span class='legendValue'>" + classes[i] + ' <b><i>cas</i></b>' +"</span>");
+            $(symbolsContainer).append(legendCircle);
+            lastRadius = currentRadius;
+        }
 
-        lastRadius = currentRadius;
+        $(legendContainer).append(symbolsContainer);
 
-    }
-
-    $(legendContainer).append(symbolsContainer); 
-
-    return legendContainer; 
+        return legendContainer;
 
     };
 
-    legend.addTo(map);  
-
-} // end createLegend();
-
+    legend.addTo(map);
+}
 
 function createSliderUI(timestamps) {
-	
-    var sliderControl = L.control({ position: 'bottomleft'} );
-
+    let sliderControl = L.control({position: 'bottomleft'});
     sliderControl.onAdd = function(map) {
+        let slider = L.DomUtil.create('input', 'range-slider');
 
-        var slider = L.DomUtil.create("input", "range-slider");
+        L.DomEvent.disableClickPropagation(slider);
 
-        L.DomEvent.addListener(slider, 'mousedown', function(e) { 
-            L.DomEvent.stopPropagation(e); 
-        });
-
-        $(slider)
-            .attr({'type':'range', 
-                'max': timestamps[timestamps.length-1], 
-                'min': timestamps[0], 
-                'step': 1,
-                'value': String(timestamps[0])})
-              .on('input change', function() {
-              updatePropSymbols($(this).val().toString());
-                  $(".temporal-legend").text(this.value);
-          });
-        return slider;
-    }
-
-    sliderControl.addTo(map)
-    createTemporalLegend(timestamps[0]); 
+        $(slider).attr({
+            'type': 'range',
+            'max': timestamps[timestamps.length - 1],
+            'min': timestamps[0],
+            'step': 1,
+            'value': String(timestamps[0])})
+            .on('input change', function() {
+                updatePropSymbols($(this).val().toString());
+                $(".temporal-legend").text(this.value);
+            });
+            return slider;
+}
+sliderControl.addTo(map);
+createTemporalLegend(timestamps[0]);
 }
 
 function createTemporalLegend(startTimestamp) {
+    let temporalLegend = L.control({position: 'bottomleft'});
+    temporalLegend.onAdd = function(map) {
+        let output = L.DomUtil.create('output', 'temporal-legend');
+        $(output).text(startTimestamp);
+        return output;
+}
 
-    var temporalLegend = L.control({ position: 'bottomleft' }); 
-
-    temporalLegend.onAdd = function(map) { 
-        var output = L.DomUtil.create("output", "temporal-legend");
-         $(output).text(startTimestamp)
-        return output; 
-    }
-
-    temporalLegend.addTo(map); 
+temporalLegend.addTo(map);
 }
 
 });
