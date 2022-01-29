@@ -198,4 +198,23 @@ function createTemporalLegend(startTimestamp) {
 temporalLegend.addTo(map);
 }
 
+// We’ll create a new info control to display the region name and the number of cases
+// I also added some CSS styles in the home.css file
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info');
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>' +  (props ?
+        '<b>' + props.r_nom + '</b><br />' + props.new_cases_day_1 + ' new cases'
+        : 'Hover over a region');
+};
+
+info.addTo(map);
+
 });
