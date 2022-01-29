@@ -163,7 +163,7 @@ let baseMaps = {
 };
 
 let overlayMaps = {
-    'Regions': regions
+    'Régions': regions
 }
 
 L.control.layers(baseMaps, overlayMaps, {
