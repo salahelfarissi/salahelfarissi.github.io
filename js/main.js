@@ -1,3 +1,6 @@
+$(document).ready(function() {
+    let c;
+
 // Leaflet providers: https://leaflet-extras.github.io/leaflet-providers/preview/
 // Stadia tilelayer
 let Stadia_AlidadeSmooth = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
@@ -19,13 +22,111 @@ let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Initialize the map
 // Coordinates of the center of Morocco from QGIS by right clicking on the map
-let map = L.map('map').setView([29.3669, -9.0375], 5);
+let map = L.map('map', {
+    zoomSnap: 0.1,
+    zoomDelta: 0.4,
+    minZoom: 5,
+}).setView([28.6, -9.0375], 5.1);
 map.zoomControl.setPosition('topleft');
 
 // Adding a default tilelayer
 // Other tilelayers are in the main.js file
 osm.addTo(map);
+
+$.getJSON("./data/regions.json")
+    .done(function(data) {
+        // console.log(data);
+        let info = processData(data);
+        createPropSymbols(info.timestamps, data);
+    })
+    .fail(function() {alert("There has been a problem loading the data.")});
     
+// Function to process the data
+function processData(data) {
+    let timestamps = [];
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (let feature in data.features) {
+        let properties = data.features[feature].properties;
+
+        for (let attribute in properties) {
+            if (attribute != 'id' &&
+            attribute != 'r_nom' &&
+            attribute != 'lat' &&
+            attribute != 'long') {
+
+                if ($.inArray(attribute, timestamps) == -1) {
+                    timestamps.push(attribute);
+                }
+
+                if (properties[attribute] < min) {
+                    min = properties[attribute];
+                }
+
+                if (properties[attribute] > max) {
+                    max = properties[attribute];
+                }
+            }
+        }
+    }
+
+    return {
+        timestamps: timestamps,
+        min: min,
+        max: max
+    }
+}
+
+function createPropSymbols(timestamps, data) {
+    c = L.geoJSON(data, {
+        pointToLayer: function(feature, latlng) {
+
+            return L.circleMarker(latlng, {
+                fillColor: "#708598",
+                color: "#537898",
+                weight: 1,
+                fillOpacity: 0.6
+            }).on({
+                mouseover: function(e) {
+                    this.openPopup();
+                    this.setStyle({color: 'yellow'});
+                },
+                mouseout: function(e) {
+                    this.closePopup();
+                    this.setStyle({color: '#537898'});
+
+                }
+
+            });
+        }
+    }).addTo(map);
+
+    updatePropSymbols(timestamps[0]);
+}
+
+function updatePropSymbols(timestamps) {
+    c.eachLayer(function(layer) {
+
+        let props = layer.feature.properties;
+        let radius = calcPropRadius(props[timestamps]);
+        let popupContent = "<b>" + String(props[timestamps]) +
+        "units</b><br>" +
+        "<i>" + props.r_nom +
+        "</i> in </i>" +
+        timestamps + "</i>";
+        layer.setRadius(radius);
+        layer.bindPopup(popupContent, {
+            offset: new L.Point(0,-radius)});
+    });
+}
+
+function calcPropRadius(attributeValue) {
+    let scaleFactor = 1;
+    let area = attributeValue * scaleFactor;
+    return Math.sqrt(area/Math.PI);
+}
+
 // Map scale
 L.control.scale({
     imperial: false,
@@ -169,3 +270,5 @@ let overlayMaps = {
 L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
 }).addTo(map);
+
+});
