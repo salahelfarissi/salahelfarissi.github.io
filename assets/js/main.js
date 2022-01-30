@@ -222,7 +222,7 @@ $(document).ready(function() {
 
     // method that we will use to update the control based on feature properties passed
     info.update = function (props) {
-        this._div.innerHTML = '<h4>Carte covid <br>Maroc</h3>' + '<br>' + '16–22 janvier 2022';
+        this._div.innerHTML = '<h4>Carte covid, Maroc</h3>' + '<br>' + 'Passer la souris sur un symbole';
     };
 
     info.addTo(map);
