@@ -6,8 +6,8 @@ $(document).ready(function() {
     let map = L.map('map', {
         zoomSnap: 0.1,
         zoomDelta: 0.4,
-        minZoom: 5,
-    }).setView([28.6, -9.0375], 5.1);
+        minZoom: 5
+    }).setView([28.6, -9.0375], 5);
     map.zoomControl.setPosition('topleft');
     
     // CartoDB tilelayer
@@ -104,7 +104,8 @@ function updatePropSymbols(timestamps) {
         " janvier 2022";
         layer.setRadius(radius);
         layer.bindPopup(popupContent, {
-            offset: new L.Point(0,-radius)});
+            offset: new L.Point(0,-radius),
+            autoPan: false});
     });
 }
 
@@ -178,8 +179,9 @@ function createSliderUI(timestamps) {
             'step': 1,
             'value': String(timestamps[0])})
             .on('input change', function() {
+                const month = " janvier 2022";
                 updatePropSymbols($(this).val().toString());
-                $(".temporal-legend").text(this.value);
+                $(".temporal-legend").text(this.value + month);
             });
             return slider;
 }
@@ -198,8 +200,6 @@ function createTemporalLegend(startTimestamp) {
 temporalLegend.addTo(map);
 }
 
-// We’ll create a new info control to display the region name and the number of cases
-// I also added some CSS styles in the home.css file
 var info = L.control();
 
 info.onAdd = function (map) {
@@ -210,11 +210,11 @@ info.onAdd = function (map) {
 
 // method that we will use to update the control based on feature properties passed
 info.update = function (props) {
-    this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>' +  (props ?
-        '<b>' + props.r_nom + '</b><br />' + props.new_cases_day_1 + ' new cases'
-        : 'Hover over a region');
+    this._div.innerHTML = '<h4>Coronavirus in Morocco</h4>';
 };
 
 info.addTo(map);
+
+
 
 });
