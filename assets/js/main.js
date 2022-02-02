@@ -1,6 +1,5 @@
 $(document).ready(function() {
     let regions_centroid;
-    let regions_polygon;
 
     // Initialize the map
     // Coordinates of the center of Morocco from QGIS by right clicking on the map
@@ -17,6 +16,19 @@ $(document).ready(function() {
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+    function style(feature) {
+    return {
+        fillColor: '#E5E5E3',
+        weight: 1,
+        opacity: 1,
+        color: '#000000',
+        dashArray: '4',
+        fillOpacity: 0.7
+    };
+}
+
+var geojson = L.geoJson(regions, {
+            style: style}).addTo(map);
 
 
 
@@ -81,8 +93,8 @@ $(document).ready(function() {
             pointToLayer: function(feature, latlng) {
 
                 return L.circleMarker(latlng, {
-                    fillColor: "#708598",
-                    color: "#537898",
+                    fillColor: "#F0A909",
+                    color: "#614504",
                     weight: 1,
                     fillOpacity: 0.6
                 }).on({

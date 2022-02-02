@@ -44,8 +44,8 @@ body {
 
 .legendCircle {
   border-radius: 50%;
-  border: 1px solid #537898;
-  background: rgba(113, 133, 152, .6);
+  border: 1px solid #614504;
+  background: rgb(240, 169, 9, 0.6);
   display: inline-block;
 }
 
