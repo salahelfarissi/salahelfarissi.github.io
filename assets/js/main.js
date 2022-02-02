@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     let regions_centroid;
 
     // Initialize the map
@@ -11,12 +11,12 @@ $(document).ready(function() {
     map.zoomControl.setPosition('topleft');
     
     // Stadia tilelayer
-    var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+    }).addTo(map);
 
-    function style(feature) {
+    function style() {
     return {
         fillColor: '#E5E5E3',
         weight: 1,
@@ -27,14 +27,8 @@ $(document).ready(function() {
     };
 }
 
-var geojson = L.geoJson(regions, {
+    L.geoJson(regions, {
             style: style}).addTo(map);
-
-
-
-
-
-
 
     $.getJSON("./data/regions_centroid.json")
         .done(function(data) {
@@ -46,11 +40,6 @@ var geojson = L.geoJson(regions, {
         })
         .fail(function() {alert("There has been a problem loading the data.")});
 
-    
-
-    
-
-    
     // Function to process the data
     function processData(data) {
         let timestamps = [];
@@ -61,12 +50,12 @@ var geojson = L.geoJson(regions, {
             let properties = data.features[feature].properties;
 
             for (let attribute in properties) {
-                if (attribute != 'id' &&
-                attribute != 'r_nom' &&
-                attribute != 'lat' &&
-                attribute != 'long') {
+                if (attribute !== 'id' &&
+                attribute !== 'r_nom' &&
+                attribute !== 'lat' &&
+                attribute !== 'long') {
 
-                    if ($.inArray(attribute, timestamps) == -1) {
+                    if ($.inArray(attribute, timestamps) === -1) {
                         timestamps.push(attribute);
                     }
 
@@ -98,11 +87,11 @@ var geojson = L.geoJson(regions, {
                     weight: 1,
                     fillOpacity: 0.6
                 }).on({
-                    mouseover: function(e) {
+                    mouseover: function() {
                         this.openPopup();
                         this.setStyle({color: 'yellow'});
                     },
-                    mouseout: function(e) {
+                    mouseout: function() {
                         this.closePopup();
                         this.setStyle({color: '#537898'});
 
@@ -151,7 +140,7 @@ var geojson = L.geoJson(regions, {
 
         let legend = L.control({position: 'bottomright'});
 
-        legend.onAdd = function(map) {
+        legend.onAdd = function() {
 
             let legendContainer = L.DomUtil.create('div', 'legend');
             let symbolsContainer = L.DomUtil.create('div', 'symbolsContainer');
@@ -191,7 +180,7 @@ var geojson = L.geoJson(regions, {
 
     function createSliderUI(timestamps) {
         let sliderControl = L.control({position: 'bottomleft'});
-        sliderControl.onAdd = function(map) {
+        sliderControl.onAdd = function() {
             let slider = L.DomUtil.create('input', 'range-slider');
 
             L.DomEvent.disableClickPropagation(slider);
@@ -215,7 +204,7 @@ var geojson = L.geoJson(regions, {
 
     function createTemporalLegend(startTimestamp) {
         let temporalLegend = L.control({position: 'bottomleft'});
-        temporalLegend.onAdd = function(map) {
+        temporalLegend.onAdd = function() {
             let output = L.DomUtil.create('output', 'temporal-legend');
             $(output).text(startTimestamp);
             return output;
@@ -224,23 +213,18 @@ var geojson = L.geoJson(regions, {
     temporalLegend.addTo(map);
     }
 
-    var info = L.control();
+    let info = L.control();
 
-    info.onAdd = function (map) {
+    info.onAdd = function () {
         this._div = L.DomUtil.create('div', 'info');
         this.update();
         return this._div;
     };
 
     // method that we will use to update the control based on feature properties passed
-    info.update = function (props) {
+    info.update = function () {
         this._div.innerHTML = '<h4>Carte covid, Maroc</h3>' + '<br>' + 'Passer la souris sur un symbole';
     };
 
     info.addTo(map);
-    
-
-
-
-
 });
