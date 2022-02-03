@@ -6,11 +6,12 @@ $(function() {
     let map = L.map('map', {
         zoomSnap: 0.1,
         zoomDelta: 0.4,
-        minZoom: 5
+        minZoom: 5,
+        maxZoom: 7.5
     }).setView([28.6, -9.0375], 5);
     map.zoomControl.setPosition('topleft');
     
-    // Stadia tilelayer
+    // OSM tilelayer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -34,6 +35,8 @@ $(function() {
     $.getJSON("./data/regions_centroid.json")
         .done(function(data) {
             let info = processData(data);
+            //! 
+            console.log(data.features);
             createPropSymbols(info.timestamps, data);
             createLegend(info.min, info.max);
             createSliderUI(info.timestamps);
@@ -55,6 +58,8 @@ $(function() {
                 attribute !== 'lat' &&
                 attribute !== 'long') {
 
+                    // Search for a specified value within an array and return its index (or -1 if not found).
+                    // jQuery.inArray( value, array [, fromIndex ] )
                     if ($.inArray(attribute, timestamps) === -1) {
                         timestamps.push(attribute);
                     }
@@ -96,7 +101,7 @@ $(function() {
                     },
                     mouseout: function() {
                         this.closePopup();
-                        this.setStyle({color: '#537898'});
+                        this.setStyle({color: '#614504'});
 
                     }
 
