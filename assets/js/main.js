@@ -1,5 +1,5 @@
 $(function() {
-    let regions_centroid;
+    let regionsCentroid;
 
     // Initialize the map
     // Coordinates of the center of Morocco from QGIS by right clicking on the map
@@ -16,6 +16,7 @@ $(function() {
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    // Style for regions baselayer
     function style() {
     return {
         fillColor: '#E5E5E3',
@@ -78,7 +79,10 @@ $(function() {
     }
 
     function createPropSymbols(timestamps, data) {
-        regions_centroid = L.geoJSON(data, {
+        // the logical nullish assignment ??= operator
+        // In the below expression, L.geoJSON assigns to regionsCentroid
+        // Only if regionsCentroid is null or undefined
+        regionsCentroid ??= L.geoJSON(data, {
             pointToLayer: function(feature, latlng) {
 
                 return L.circleMarker(latlng, {
@@ -105,7 +109,7 @@ $(function() {
     }
 
     function updatePropSymbols(timestamps) {
-        regions_centroid.eachLayer(function(layer) {
+        regionsCentroid.eachLayer(function(layer) {
 
             let props = layer.feature.properties;
             let radius = calcPropRadius(props[timestamps]);
