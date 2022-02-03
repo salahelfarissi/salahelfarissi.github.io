@@ -40,6 +40,7 @@ $(function() {
             createPropSymbols(info.timestamps, data);
             createLegend(info.min, info.max);
             createSliderUI(info.timestamps);
+            createInfo();
         })
         .fail(function() {alert("There has been a problem loading the data.")});
 
@@ -108,15 +109,18 @@ $(function() {
                 }).addTo(map);
             }
         });
-
         updatePropSymbols(timestamps[0]);
     }
 
     function updatePropSymbols(timestamps) {
         regionsCentroid.eachLayer(function(layer) {
-
+            
             let props = layer.feature.properties;
+            //! console.log(props[timestamps]);
             let radius = calcPropRadius(props[timestamps]);
+            //! New code
+            // let info = createInfo(props[timestamps]);
+
             let popupContent = "<b>" + String(props[timestamps]) +
             " nouveaux cas</b><br>" +
             "<i>" + props.r_nom + "<br>" +
@@ -221,18 +225,20 @@ $(function() {
     temporalLegend.addTo(map);
     }
 
-    let info = L.control();
+    function createInfo() {
+        let info = L.control();
 
-    info.onAdd = function () {
-        this._div = L.DomUtil.create('div', 'info');
-        this.update();
-        return this._div;
-    };
+        info.onAdd = function () {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
 
-    // method that we will use to update the control based on feature properties passed
-    info.update = function () {
-        this._div.innerHTML = '<h4>Carte covid, Maroc</h3>' + '<br>' + 'Passer la souris sur un symbole';
-    };
+        // method that we will use to update the control based on feature properties passed
+        info.update = function () {
+            this._div.innerHTML = '<h4>Carte covid, Maroc</h3>' + '<br>' + 'Passer la souris sur un symbole';
+        };
 
-    info.addTo(map);
+        info.addTo(map);
+    }
 });
