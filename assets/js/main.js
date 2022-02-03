@@ -36,7 +36,7 @@ $(function() {
         .done(function(data) {
             let info = processData(data);
             //! 
-            console.log(data.features);
+            console.log(info);
             createPropSymbols(info.timestamps, data);
             createLegend(info.min, info.max);
             createSliderUI(info.timestamps);
@@ -116,7 +116,7 @@ $(function() {
         regionsCentroid.eachLayer(function(layer) {
             
             let props = layer.feature.properties;
-            //! console.log(props[timestamps]);
+            //? console.log(props[timestamps]);
             let radius = calcPropRadius(props[timestamps]);
             //! New code
             // let info = createInfo(props[timestamps]);
@@ -124,7 +124,7 @@ $(function() {
             let popupContent = "<b>" + String(props[timestamps]) +
             " nouveaux cas</b><br>" +
             "<i>" + props.r_nom + "<br>" +
-            "</i>  </i>" +
+            "</i>" +
             timestamps + "</i>" +
             " janvier 2022";
             layer.setRadius(radius);
@@ -154,6 +154,7 @@ $(function() {
 
         legend.onAdd = function() {
 
+            // Creates an element with tagName 'div', sets the className 'legend', and optionally appends it to container element.
             let legendContainer = L.DomUtil.create('div', 'legend');
             let symbolsContainer = L.DomUtil.create('div', 'symbolsContainer');
             let classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)];
@@ -172,9 +173,11 @@ $(function() {
                 currentRadius = calcPropRadius(classes[i]);
                 margin = -currentRadius - lastRadius - 2;
 
-                $(legendCircle).attr("style", "width: " + (currentRadius * 2) +
-                "px; height: " + (currentRadius * 2) +
-                "px; margin-left: " + margin + "px");
+                // Setting style using a template literal
+                $(legendCircle).attr("style",
+                    "width: " + (currentRadius * 2) + "px; " + 
+                    "height: " + (currentRadius * 2) + "px; " +
+                    "margin-left: " + margin + "px");
 
                 $(legendCircle).append("<span class='legendValue'>" + classes[i] + ' <b><i>cas</i></b>' +"</span>");
                 $(symbolsContainer).append(legendCircle);
@@ -195,8 +198,10 @@ $(function() {
         sliderControl.onAdd = function() {
             let slider = L.DomUtil.create('input', 'range-slider');
 
+            // Disables propagation of mousedown events to the map
             L.DomEvent.disableClickPropagation(slider);
 
+            // $(selector).attr({attribute:value, attribute:value,...})
             $(slider).attr({
                 'type': 'range',
                 'max': timestamps[timestamps.length - 1],
@@ -219,6 +224,7 @@ $(function() {
         temporalLegend.onAdd = function() {
             let output = L.DomUtil.create('output', 'temporal-legend');
             $(output).text(startTimestamp);
+            $(output).append(" janvier 2022");
             return output;
     }
 
