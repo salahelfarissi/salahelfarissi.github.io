@@ -33,7 +33,6 @@ $(function() {
 
     $.getJSON("./data/regions_centroid.json")
         .done(function(data) {
-            // console.log(data);
             let info = processData(data);
             createPropSymbols(info.timestamps, data);
             createLegend(info.min, info.max);
