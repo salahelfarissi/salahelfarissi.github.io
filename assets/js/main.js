@@ -1,6 +1,6 @@
 $(function() {
     let regionsCentroid;
-
+    
     // Initialize the map
     // Coordinates of the center of Morocco from QGIS by right clicking on the map
     let map = L.map('map', {
@@ -26,8 +26,8 @@ $(function() {
         color: '#000000',
         dashArray: '4',
         fillOpacity: 0.7
-    };
-}
+        };
+    }
 
     L.geoJson(regions, {
             style: style}).addTo(map);
@@ -35,8 +35,7 @@ $(function() {
     $.getJSON("./data/regions_centroid.json")
         .done(function(data) {
             let info = processData(data);
-            //! 
-            console.log(info);
+
             createPropSymbols(info.timestamps, data);
             createLegend(info.min, info.max);
             createSliderUI(info.timestamps);
@@ -110,17 +109,14 @@ $(function() {
             }
         });
         updatePropSymbols(timestamps[0]);
+        let classes = calculateNaturalBreaksClasses(timestamps[0]);
     }
 
     function updatePropSymbols(timestamps) {
         regionsCentroid.eachLayer(function(layer) {
             
             let props = layer.feature.properties;
-            //? console.log(props[timestamps]);
             let radius = calcPropRadius(props[timestamps]);
-            //! New code
-            // let info = createInfo(props[timestamps]);
-
             let popupContent = "<b>" + String(props[timestamps]) +
             " nouveaux cas</b><br>" +
             "<i>" + props.r_nom + "<br>" +
@@ -132,6 +128,19 @@ $(function() {
                 offset: new L.Point(0,-radius),
                 autoPan: false});
         });
+    }
+
+    function calculateNaturalBreaksClasses(timestamps) {
+        let data = [];
+        let classes;
+        regionsCentroid.eachLayer(function(layer) {
+            let props = layer.feature.properties;
+            data.push(props[timestamps]);
+            if (data.length === regionsCentroid.getLayers().length) {
+                classes = ss.jenks(data, 4);      
+            } 
+        })
+        return classes
     }
 
     function calcPropRadius(attributeValue) {
