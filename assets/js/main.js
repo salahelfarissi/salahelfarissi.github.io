@@ -7,10 +7,10 @@ $(function() {
         zoomSnap: 0.1,
         zoomDelta: 0.4,
         minZoom: 5,
-        maxZoom: 7.5
+        maxZoom: 7.5,
+        zoomControl: true
     }).setView([28.6, -9.0375], 5);
-    map.zoomControl.setPosition('topleft');
-    
+
     // OSM tilelayer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
@@ -89,6 +89,7 @@ $(function() {
         regionsCentroid ??= L.geoJSON(data, {
             pointToLayer: function(feature, latlng) {
 
+                // TODO: Change circles color
                 return L.circleMarker(latlng, {
                     fillColor: "#F0A909",
                     color: "#614504",
@@ -109,7 +110,6 @@ $(function() {
             }
         });
         updatePropSymbols(timestamps[0]);
-        let classes = calculateNaturalBreaksClasses(timestamps[0]);
     }
 
     function updatePropSymbols(timestamps) {
@@ -128,19 +128,6 @@ $(function() {
                 offset: new L.Point(0,-radius),
                 autoPan: false});
         });
-    }
-
-    function calculateNaturalBreaksClasses(timestamps) {
-        let data = [];
-        let classes;
-        regionsCentroid.eachLayer(function(layer) {
-            let props = layer.feature.properties;
-            data.push(props[timestamps]);
-            if (data.length === regionsCentroid.getLayers().length) {
-                classes = ss.jenks(data, 4);      
-            } 
-        })
-        return classes
     }
 
     function calcPropRadius(attributeValue) {
