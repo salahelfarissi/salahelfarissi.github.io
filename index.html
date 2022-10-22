@@ -24,7 +24,7 @@
       function Header({title}) {
         return (
             <header id="header">
-                <h1>{title}</h1>
+                <h1>{title ? title : 'SALAHEDDINE EL FARISSI'}</h1>
               </header>
         )
       }
@@ -32,7 +32,7 @@
       function HomePage() {
         return (
           <div>
-            <Header title="SALAHEDDINE EL FARISSI"/>
+            <Header />
           </div>
         )
       }
