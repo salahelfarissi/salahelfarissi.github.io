@@ -28,7 +28,15 @@
               </header>
         )
       }
-      ReactDOM.render(<Header />, app);
+
+      function HomePage() {
+        return (
+          <div>
+            <Header />
+          </div>
+        )
+      }
+      ReactDOM.render(<HomePage />, app);
     </script>
 </body>
 
