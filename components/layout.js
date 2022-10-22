@@ -4,7 +4,7 @@ import styles from './layout.module.css';
 import utilStyles from '../styles/utils.module.css';
 import Link from 'next/link';
 
-const name = 'Salaheddine EL FARISSI';
+const name = 'Salaheddine El Farissi';
 export const siteTitle = 'Salaheddine El Farissi';
 
 export default function Layout({ children, home }) {
@@ -34,7 +34,7 @@ export default function Layout({ children, home }) {
               className={utilStyles.borderCircle}
               height={144}
               width={144}
-              alt=""
+              alt={name}
             />
             <h1 className={utilStyles.heading2Xl}>{name}</h1>
           </>
@@ -48,7 +48,7 @@ export default function Layout({ children, home }) {
                   className={utilStyles.borderCircle}
                   height={108}
                   width={108}
-                  alt=""
+                  alt={name}
                 />
               </a>
             </Link>
