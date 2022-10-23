@@ -25,7 +25,11 @@ export default function Home({ allPostsData }) {
         <section className={utilStyles.headingMd}>
           <p>
             Hello, I'm Salaheddine. I'm a geomatics engineer. You can contact me
-            on <a href="https://twitter.com/salah_elfarissi">Twitter</a>.
+            on{" "}
+            <a href="https://www.linkedin.com/in/selfarissi/" target={"_blank"}>
+              LinkedIn
+            </a>
+            .
           </p>
         </section>
         <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
