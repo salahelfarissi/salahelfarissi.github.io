@@ -49,7 +49,7 @@ export default function Home({ allPostsData }) {
           </ul>
         </section>
       </Layout>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
