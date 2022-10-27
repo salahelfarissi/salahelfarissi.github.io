@@ -9,7 +9,7 @@ This project couldn't have seen light without the close cooperation of our fello
 
 The geoportal allows for seamless navigation inside the campus in **2D & 3D** view, giving the user access to the main information about the major structures and buildings.
 
-The app relies on [mapbox](https://www.mapbox.com/) for geographic tiles retrieval, and [jQuery](https://jquery.com/) for site interactivity (jQuery...).
+The app relies on [mapbox](https://www.mapbox.com/) for geographic tiles retrieval, and [jQuery](https://jquery.com/) for site interactivity.
 
 Further development will take place to enhance the geoportal **user experience**.
 
