@@ -23,7 +23,7 @@ export default function Home({ allPostsData }) {
         </Head>
         <section className={utilStyles.headingMd}>
           <p>
-            Hello, I'm Salaheddine. I'm a geomatics engineer. You can contact me
+            Hello, I'm Salaheddine. I'm a Full-Stack Developer (Node.js/React). You can contact me
             on{" "}
             <a href="https://www.linkedin.com/in/selfarissi/" target={"_blank"}>
               LinkedIn
