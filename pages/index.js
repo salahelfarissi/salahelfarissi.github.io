@@ -28,6 +28,10 @@ export default function Home({ allPostsData }) {
             <a href="https://www.linkedin.com/in/selfarissi/" target={"_blank"}>
               LinkedIn
             </a>
+            , or follow my Full-Stack journey on{" "}
+            <a href="https://frontendmasters.com/u/salahelfarissi/" target={"_blank"}>
+              Frontend Masters
+            </a>
             .
           </p>
         </section>
